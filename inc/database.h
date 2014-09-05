@@ -3,6 +3,7 @@
 
 #include <sys/stat.h>
 #include <stdio.h>
+#include <fcntl.h>
 
 #define MOVIE_INITIAL_TICKETS 100
 #define MOVIE_NAME_LENGTH 100
@@ -32,6 +33,10 @@ void movie_init(movie_t* movie, char* name, char* time);
 
 database_t db_open(char* path);
 void db_close(database_t);
+
+void db_rlock(database_t database);
+void db_wlock(database_t database);
+void db_unlock(database_t database);
 
 movie_t* db_find(database_t database, char* name);
 

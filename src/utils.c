@@ -2,6 +2,8 @@
 #include "../inc/database.h"
 
 ticket_t u_buy_ticket (database_t database, char* movie_name) {
+    db_wlock(database);
+
     movie_t *movie = db_find(database, movie_name);
 
     if (movie == NULL) {
@@ -19,6 +21,7 @@ ticket_t u_buy_ticket (database_t database, char* movie_name) {
     movie->tickets[MOVIE_INITIAL_TICKETS - movie->remaining_tickets] = id;
     movie->remaining_tickets--;
 
+    db_unlock(database);
     return id;
 }
 

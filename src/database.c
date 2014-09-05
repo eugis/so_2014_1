@@ -3,6 +3,8 @@
 #include <string.h>
 #include <stdio.h>
 #include <errno.h>
+#include <sys/types.h>
+#include <unistd.h>
 #include <sys/mman.h>
 #include <sys/stat.h>
 
@@ -50,6 +52,40 @@ void db_close(database_t database) {
     munmap(database.movies, database.st.st_size);
     fclose(database.file);
 }
+
+
+static void db_lock(database_t database, int type) {
+    struct flock fl;
+        
+    fl.l_type   = type;
+    fl.l_whence = SEEK_SET;
+    fl.l_start  = 0;
+    fl.l_len    = 0;
+    fl.l_pid    = getpid();
+
+    fcntl(fileno(database.file), F_SETLKW, &fl);
+}
+
+void db_rlock(database_t database) {
+    db_lock(database, F_RDLCK);
+}
+
+void db_wlock(database_t database) {
+    db_lock(database, F_WRLCK);  
+}
+
+void db_unlock(database_t database) {
+    struct flock fl;
+        
+    fl.l_type   = F_UNLCK;
+    fl.l_whence = SEEK_SET;
+    fl.l_start  = 0;
+    fl.l_len    = 0;
+    fl.l_pid    = getpid();
+
+    fcntl(fileno(database.file), F_SETLKW, &fl);
+}
+
 
 
 movie_t* db_find(database_t database, char *name) {
