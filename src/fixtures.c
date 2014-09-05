@@ -43,8 +43,3 @@ void fixtures_read(char *database_path, char *fixtures_path) {
     fclose(database);
     fclose(fixtures);
 }
-
-
-int main() {
-    fixtures_read("db", "fixtures.txt");
-}

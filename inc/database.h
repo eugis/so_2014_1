@@ -1,9 +1,13 @@
 #ifndef __DATABASE_H__
 #define __DATABASE_H__
 
+#include <sys/stat.h>
+#include <stdio.h>
+
 #define MOVIE_INITIAL_TICKETS 100
 #define MOVIE_NAME_LENGTH 100
 #define MOVIE_TIME_LENGTH 100
+
 
 typedef struct movie {
     char name[MOVIE_NAME_LENGTH];
@@ -14,6 +18,21 @@ typedef struct movie {
 } movie_t;
 
 
+typedef struct database {
+    FILE* file;
+    struct stat st;
+
+    int count;
+    movie_t* movies;
+} database_t;
+
+
 void movie_init(movie_t* movie, char* name, char* time);
+
+
+database_t db_open(char* path);
+void db_close(database_t);
+
+movie_t* db_find(database_t database, char* name);
 
 #endif
