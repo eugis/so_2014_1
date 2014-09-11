@@ -4,8 +4,11 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
+#include <unistd.h>
 #include <fcntl.h>
 #include <signal.h>
+#include <sys/types.h>
+#include <sys/stat.h>
 
 
 static void signal_handler(int signum) {
@@ -13,6 +16,7 @@ static void signal_handler(int signum) {
        All we want is to be unblocked when the signal arrives,
        so this function does nothing.
     */
+   (void) signum; /* avoid unused parameter warning */
 }
 
 
@@ -87,7 +91,7 @@ void ipc_close(ipc_t* ipc) {
 }
 
 
-int ipc_send(ipc_t* ipc, uint16_t recipient, void *content, uint16_t length) {
+void ipc_send(ipc_t* ipc, uint16_t recipient, void *content, uint16_t length) {
     char path[250];
     sprintf(path, "%s/%d", ipc->root, recipient);
 
@@ -136,31 +140,4 @@ message_t* ipc_recv(ipc_t* ipc) {
     fclose(inbox);
 
     return msg;
-}
-
-
-int main() {
-    int parent = getpid();
-    printf("Parent: %d\n", parent);
-
-    if (fork() > 0) {
-        ipc_t* ipc = ipc_open("./tmp");
-        message_t* msg = ipc_recv(ipc);
-        ipc_close(ipc);
-        
-        printf("%p\n", msg);
-        printf("%d, %d\n", msg->sender, msg->content_length);
-        printf("%s\n", msg->content);
-
-
-    } else {
-        sleep(1);
-
-        int child = getpid();
-        printf("Child: %d\n", child);
-
-        ipc_t* ipc = ipc_open("./tmp");
-        ipc_send(ipc, parent, (void*) "hola", 5);
-        ipc_close(ipc);
-    }
 }

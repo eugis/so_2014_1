@@ -1,5 +1,5 @@
-#ifndef __DATABASE_H__
-#define __DATABASE_H__
+#ifndef __FILESIG_H__
+#define __FILESIG_H__
 
 
 #include <stdint.h>
@@ -15,14 +15,14 @@ typedef struct {
     uint16_t sender;
     uint16_t content_length;
 
-    char content[0]; /* embedded char array */
+    char content[1]; /* embedded char array, will be actually longer than 1 */
 } message_t;
 
 
 ipc_t* ipc_open(char *root);
 void ipc_close(ipc_t *ipc);
 
-int ipc_send(ipc_t *ipc, uint16_t recipient, void *message, uint16_t size);
+void ipc_send(ipc_t *ipc, uint16_t recipient, void *message, uint16_t size);
 message_t* ipc_recv(ipc_t *ipc);
 
 #endif
