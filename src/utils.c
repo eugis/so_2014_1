@@ -28,12 +28,12 @@ ticket_t u_buy_ticket (database_t database, char* movie_name) {
 // movie_t* u_show_ticket(ticket_t ticket) {
 // }
 
-int main() {
-    database_t database = db_open("db");
+// int main() {
+//     database_t database = db_open("db");
 
-    ticket_t ticket = u_buy_ticket(database, "Matrix");
+//     ticket_t ticket = u_buy_ticket(database, "Matrix");
 
-    printf("%d\n", ticket);
+//     printf("%d\n", ticket);
 
-    db_close(database);
-}
+//     db_close(database);
+// }
