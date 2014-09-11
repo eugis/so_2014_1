@@ -14,7 +14,7 @@ obj:
 	mkdir obj
 
 obj/%.o: src/%.c inc/%.h
-	gcc $(C_FLAGS) -c $< -o $@ 
+	gcc  -c $< -o $@ $(C_FLAGS)
 
 clean:
 	rm -r obj
