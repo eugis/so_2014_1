@@ -1,6 +1,7 @@
 #ifndef __DATABASE_H__
 #define __DATABASE_H__
 
+#include <stdint.h>
 #include <sys/stat.h>
 #include <stdio.h>
 #include <fcntl.h>
@@ -23,7 +24,7 @@ typedef struct database {
     FILE* file;
     struct stat st;
 
-    int count;
+    uint16_t count;
     movie_t* movies;
 } database_t;
 

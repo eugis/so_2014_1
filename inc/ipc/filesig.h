@@ -14,8 +14,7 @@ typedef struct {
 typedef struct {
     uint16_t sender;
     uint16_t content_length;
-
-    char content[1]; /* embedded char array, will be actually longer than 1 */
+    char content[];
 } message_t;
 
 
