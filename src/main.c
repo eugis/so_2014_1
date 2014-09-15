@@ -12,12 +12,12 @@ int main() {
     printf("S %d\n", server);
 
     if (fork() > 0) {
-        database_t database = db_open("db");
+        database_t *database = db_open("db");
         ipc_t* ipc = ipc_open("./tmp");
 
         message_t* msg = ipc_recv(ipc);
 
-        res_movie_list(ipc, msg->sender, &database);
+        res_movie_list(ipc, msg->sender, database);
 
         // printf("S %p\n", msg);
         // printf("S %d, %d\n", msg->sender, msg->content_length);

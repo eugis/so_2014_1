@@ -1,7 +1,7 @@
 #include "../inc/utils.h"
 #include "../inc/database.h"
 
-ticket_t u_buy_ticket (database_t database, char* movie_name) {
+ticket_t u_buy_ticket (database_t *database, char* movie_name) {
     db_wlock(database);
 
     movie_t *movie = db_find(database, movie_name);

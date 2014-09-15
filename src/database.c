@@ -1,5 +1,6 @@
 #include <string.h>
 #include <stdio.h>
+#include <stdlib.h>
 #include <errno.h>
 #include <sys/types.h>
 #include <unistd.h>
@@ -18,7 +19,7 @@ void movie_init(movie_t* movie, char* name, char* time) {
 }
 
 
-database_t db_open(char* path) {
+database_t *db_open(char *path) {
     FILE *db_file = fopen(path, "r+");
 
     struct stat st;
@@ -37,22 +38,25 @@ database_t db_open(char* path) {
         printf("NOOOOOOOOOOOOOOOO %d\n", errno);
     }
 
-    return (database_t) {
-        .file   = db_file,
-        .st     = st,
-        .count  = st.st_size / sizeof(movie_t),
-        .movies = (movie_t*) movies,
-    };
+    database_t *database = (database_t*) malloc(sizeof(*database));
+
+    database->file   = db_file;
+    database->st     = st;
+    database->count  = st.st_size / sizeof(movie_t);
+    database->movies = (movie_t*) movies;
+
+    return database;
 }
 
 
-void db_close(database_t database) {
-    munmap(database.movies, database.st.st_size);
-    fclose(database.file);
+void db_close(database_t *database) {
+    munmap(database->movies, database->st.st_size);
+    fclose(database->file);
+    free(database);
 }
 
 
-static void db_lock(database_t database, int type) {
+static void db_lock(database_t *database, int type) {
     struct flock fl;
         
     fl.l_type   = type;
@@ -61,18 +65,18 @@ static void db_lock(database_t database, int type) {
     fl.l_len    = 0;
     fl.l_pid    = getpid();
 
-    fcntl(fileno(database.file), F_SETLKW, &fl);
+    fcntl(fileno(database->file), F_SETLKW, &fl);
 }
 
-void db_rlock(database_t database) {
+void db_rlock(database_t *database) {
     db_lock(database, F_RDLCK);
 }
 
-void db_wlock(database_t database) {
+void db_wlock(database_t *database) {
     db_lock(database, F_WRLCK);  
 }
 
-void db_unlock(database_t database) {
+void db_unlock(database_t *database) {
     struct flock fl;
         
     fl.l_type   = F_UNLCK;
@@ -81,15 +85,15 @@ void db_unlock(database_t database) {
     fl.l_len    = 0;
     fl.l_pid    = getpid();
 
-    fcntl(fileno(database.file), F_SETLKW, &fl);
+    fcntl(fileno(database->file), F_SETLKW, &fl);
 }
 
 
 
-movie_t* db_find(database_t database, char *name) {
-    for (int i = 0; i < database.count; i++) {
-        if (strcmp(database.movies[i].name, name) == 0)
-            return &(database.movies[i]);
+movie_t* db_find(database_t *database, char *name) {
+    for (int i = 0; i < database->count; i++) {
+        if (strcmp(database->movies[i].name, name) == 0)
+            return &(database->movies[i]);
     }
 
     return NULL;
