@@ -6,12 +6,12 @@
 #include "ipc.h"
 #include "database.h"
 
-/* All actions have a REQUEST function, a RESPONSE function, and a HANDLE
+/* All actions have a REQUEST function, a RESPONSE function, and a HANDLER
    function. Their flow is:
 
     client -> request()
     server -> response()
-    client -> handle()
+    client -> handler()
 
    Their respective serializable structures are `struct req_*` and
    `struct res_*`.
