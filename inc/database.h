@@ -10,13 +10,14 @@
 #define MOVIE_NAME_LENGTH 100
 #define MOVIE_TIME_LENGTH 100
 
+typedef uint32_t ticket_t;
 
 typedef struct movie {
     char name[MOVIE_NAME_LENGTH];
     char time[MOVIE_TIME_LENGTH];
 
-    int remaining_tickets;
-    int tickets[MOVIE_INITIAL_TICKETS];
+    uint16_t remaining_tickets;
+    ticket_t tickets[MOVIE_INITIAL_TICKETS];
 } movie_t;
 
 

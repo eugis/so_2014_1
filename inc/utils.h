@@ -3,9 +3,7 @@
 
 #include "database.h"
 
-typedef int ticket_t;
-
-ticket_t u_buy_ticket (database_t *database, char* movie_name);
-movie_t* u_show_ticket(database_t *database, ticket_t ticket);
+ticket_t u_buy_ticket (database_t *database, int movie_i);
+movie_t* u_get_ticket(database_t *database, ticket_t ticket);
 
 #endif
