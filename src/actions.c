@@ -49,7 +49,7 @@ void req_buy_ticket(ipc_t *ipc, uint16_t recipient, uint16_t movie_i) {
 }
 
 void res_buy_ticket(ipc_t *ipc, database_t *db, uint16_t sender, req_buy_ticket_t *req) {
-    ticket_t ticket = u_buy_ticket(db, req->movie_i);
+    ticket_t ticket = db_buy_ticket(db, req->movie_i);
 
     res_buy_ticket_t res = {
         .type   = ACTION_BUY_TICKET,
@@ -79,7 +79,7 @@ void req_get_ticket(ipc_t *ipc, uint16_t recipient, ticket_t ticket) {
 }
 
 void res_get_ticket(ipc_t *ipc, database_t *db, uint16_t sender, req_get_ticket_t *req) {
-    movie_t *movie = u_get_ticket(db, req->ticket);
+    movie_t *movie = db_get_ticket(db, req->ticket);
 
     res_get_ticket_t res = {
         .type  = ACTION_BUY_TICKET,

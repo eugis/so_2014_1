@@ -3,9 +3,9 @@
 #include <sys/types.h>
 #include <unistd.h>
 
-#include "../inc/ipc.h"
-#include "../inc/actions.h"
-#include "../inc/utils.h"
+#include "../../inc/ipc.h"
+#include "../../inc/actions.h"
+#include "../../inc/utils.h"
 
 
 void server() {
@@ -65,10 +65,10 @@ void client(int server_pid) {
 void test() {
     database_t *database = db_open("db");
 
-    ticket_t ticket = u_buy_ticket(database, 0);
+    ticket_t ticket = db_buy_ticket(database, 0);
     printf("Ticket: %d\n", ticket);
 
-    printf("Movie: %s\n", u_get_ticket(database, ticket)->name);
+    printf("Movie: %s\n", db_get_ticket(database, ticket)->name);
 
     db_close(database);
 }

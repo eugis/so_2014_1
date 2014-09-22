@@ -16,7 +16,6 @@ static void signal_handler(int signum) {
        All we want is to be unblocked when the signal arrives,
        so this function does nothing.
     */
-   (void) signum; /* avoid unused parameter warning */
 }
 
 
@@ -78,6 +77,8 @@ ipc_t* ipc_open(char* root) {
 
     ipc->id   = getpid();
     ipc->root = strdup(root);
+
+    mkdir(root, 0777);
 
     install_signal_handler();
 

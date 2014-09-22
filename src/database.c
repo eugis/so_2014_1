@@ -14,7 +14,7 @@ void movie_init(movie_t* movie, char* name, char* time) {
     strncpy(movie->name, name, MOVIE_NAME_LENGTH);
     strncpy(movie->time, time, MOVIE_TIME_LENGTH);
 
-    movie->remaining_tickets = MOVIE_INITIAL_TICKETS;
+    movie->remaining_tickets = MOVIE_MAX_TICKETS;
     memset(movie->tickets, 0, sizeof(movie->tickets));
 }
 
@@ -97,4 +97,47 @@ movie_t* db_find(database_t *database, char *name) {
     }
 
     return NULL;
+}
+
+
+ticket_t db_buy_ticket (database_t *database, int movie_i) {
+    db_wlock(database);
+
+    movie_t *movie = &(database->movies[movie_i]);
+
+    if (movie == NULL) {
+        printf("No existe %s\n", movie->name);
+        return 0;
+    }
+
+    if (movie->remaining_tickets == 0) {
+        printf("No hay mas tickets para %s\n", movie->name);
+        return 0;
+    }
+
+    ticket_t ticket = MOVIE_MAX_TICKETS - movie->remaining_tickets + 1;
+
+    movie->tickets[MOVIE_MAX_TICKETS - movie->remaining_tickets] = ticket;
+    movie->remaining_tickets--;
+
+    db_unlock(database);
+    return ticket;
+}
+
+
+movie_t* db_get_ticket(database_t *database, ticket_t ticket) {
+    db_rlock(database);
+
+    int movie_i, ticket_i;
+    movie_t* movie = NULL;
+
+    for (movie_i = 0; movie_i < database->count; movie_i++) {
+        for (ticket_i = 0; ticket_i < MOVIE_MAX_TICKETS; ticket_i++) {
+            if (database->movies[movie_i].tickets[ticket_i] == ticket)
+                movie = &(database->movies[movie_i]);
+        }
+    }
+    
+    db_unlock(database);
+    return movie;
 }
