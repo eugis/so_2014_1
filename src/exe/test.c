@@ -48,7 +48,7 @@ void client(int server_pid) {
     han_movie_list((res_movie_list_t*) &(msg->content));
     free(msg);
 
-    req_buy_ticket(ipc, server_pid, 0);
+    req_buy_ticket(ipc, server_pid, 1);
     msg = ipc_recv(ipc);
     ticket_t ticket = ((res_buy_ticket_t*) &(msg->content))->ticket;
     han_buy_ticket((res_buy_ticket_t*) &(msg->content));

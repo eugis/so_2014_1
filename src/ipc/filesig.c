@@ -31,7 +31,7 @@ static void install_signal_handler() {
 
 static void flock(FILE *file, int type) {
     struct flock fl;
-        
+
     fl.l_type   = type;
     fl.l_whence = SEEK_SET;
     fl.l_start  = 0;
@@ -46,12 +46,12 @@ static void frlock(FILE* file) {
 }
 
 static void fwlock(FILE* file) {
-    flock(file, F_WRLCK);  
+    flock(file, F_WRLCK);
 }
 
 static void funlock(FILE* file) {
     struct flock fl;
-        
+
     fl.l_type   = F_UNLCK;
     fl.l_whence = SEEK_SET;
     fl.l_start  = 0;
@@ -64,7 +64,7 @@ static void funlock(FILE* file) {
 
 static int fsize(FILE* file) {
     struct stat st;
-    
+
     if (fstat(fileno(file), &st) != 0)
         return 0;
 
@@ -99,9 +99,15 @@ void ipc_send(ipc_t* ipc, uint16_t recipient, void *content, uint16_t length) {
     FILE *inbox = fopen(path, "a");
     fwlock(inbox);
 
+    fwrite(content, length, 1, inbox);
+
+    /* The content is written *before* the header. The file will then be
+    *  read from the end. This allows recv() to read a single message and
+    *  truncate the file (which can't be done from the beginning).
+    */
+
     fwrite(&(ipc->id), sizeof(ipc->id), 1, inbox);
     fwrite(&length, sizeof(length), 1, inbox);
-    fwrite(content, length, 1, inbox);
 
     funlock(inbox);
     fclose(inbox);
@@ -115,27 +121,37 @@ message_t* ipc_recv(ipc_t* ipc) {
     char path[250];
     sprintf(path, "%s/%d", ipc->root, ipc->id);
 
-    FILE *inbox = fopen(path, "w+");
+    FILE *inbox = fopen(path, "a+");
+    size_t size;
 
     /* Check if the file has messages, wait if it doesn't: */
-    while (fsize(inbox) == 0)
+    while ((size = fsize(inbox)) == 0)
         pause();
 
     frlock(inbox);
 
-    /* Read header: */
+    /* Read header (located at the end of the file): */
     uint16_t sender;
     uint16_t content_length;
+
+    fseek(inbox, -sizeof(message_t), SEEK_END);
 
     fread(&sender, sizeof(sender), 1, inbox);
     fread(&content_length, sizeof(content_length), 1, inbox);
 
-    /* Alloc and read content: */
-    message_t* msg = (message_t*) malloc(sizeof(message_t) + content_length);
+    /* Alloc and read content (located before header): */
+    size_t message_size = sizeof(message_t) + content_length;
+
+    fseek(inbox, -message_size, SEEK_END);
+
+    message_t* msg = (message_t*) malloc(message_size);
 
     fread(msg->content, content_length, 1, inbox);
     msg->sender = sender;
     msg->content_length = content_length;
+
+    /* Remove this message from the inbox: */
+    ftruncate(fileno(inbox), size - message_size);
 
     funlock(inbox);
     fclose(inbox);
