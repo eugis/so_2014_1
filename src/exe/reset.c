@@ -6,12 +6,12 @@
 
 
 int main(int argc, char* argv[]) {
-    char *fixtures = argv[1];
-    char *database = argv[2];
+    char *database = argv[1];
+    char *fixtures = argv[2];
 
     printf("Recreating database at %s (from %s)...\n", database, fixtures);
 
-    fixtures_read(argv[1], argv[2]);
+    fixtures_read(database, fixtures);
 
     printf("done.\n");
 }

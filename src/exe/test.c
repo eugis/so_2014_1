@@ -65,7 +65,7 @@ void client(int server_pid) {
 void test() {
     database_t *database = db_open("db");
 
-    ticket_t ticket = db_buy_ticket(database, 0);
+    ticket_t ticket = db_buy_ticket(database, 1);
     printf("Ticket: %d\n", ticket);
 
     printf("Movie: %s\n", db_get_ticket(database, ticket)->name);

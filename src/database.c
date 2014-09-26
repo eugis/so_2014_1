@@ -115,7 +115,11 @@ ticket_t db_buy_ticket (database_t *database, int movie_i) {
         return 0;
     }
 
-    ticket_t ticket = MOVIE_MAX_TICKETS - movie->remaining_tickets + 1;
+    /* As long as they are unique, ticket number generation doesn't matter */
+    ticket_t ticket =
+        (movie_i * MOVIE_MAX_TICKETS)
+      + (MOVIE_MAX_TICKETS - movie->remaining_tickets) + 1
+    ;
 
     movie->tickets[MOVIE_MAX_TICKETS - movie->remaining_tickets] = ticket;
     movie->remaining_tickets--;
