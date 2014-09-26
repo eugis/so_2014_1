@@ -50,10 +50,11 @@ void client(int server_pid) {
 
     req_buy_ticket(ipc, server_pid, 0);
     msg = ipc_recv(ipc);
+    ticket_t ticket = ((res_buy_ticket_t*) &(msg->content))->ticket;
     han_buy_ticket((res_buy_ticket_t*) &(msg->content));
     free(msg);
 
-    req_get_ticket(ipc, server_pid, 1505);
+    req_get_ticket(ipc, server_pid, ticket);
     msg = ipc_recv(ipc);
     han_get_ticket((res_get_ticket_t*) &(msg->content));
     free(msg);
