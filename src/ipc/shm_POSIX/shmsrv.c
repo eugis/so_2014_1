@@ -30,7 +30,7 @@ main()
 
 
   msg = ipc_recv(ipc);
-  printf("PASE res_get_ticket\n");
+
   res_get_ticket(ipc, database, msg->sender, (req_get_ticket_t*) &(msg->content));
   free(msg);
 

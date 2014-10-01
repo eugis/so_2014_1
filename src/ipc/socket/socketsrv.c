@@ -45,22 +45,12 @@ accept_client(int server){
 	struct sockaddr cli;
 	int h;
 
-	/*
-	* La llamada a la funcion accept requiere que el parametro 
-	* Longitud_Cliente contenga inicialmente el tamano de la
-	* estructura Cliente que se le pase. A la vuelta de la
-	* funcion, esta variable contiene la longitud de la informacion
-	* util devuelta en Cliente
-	*/
 	len_cli = sizeof (cli);
 	h = accept (server, &cli, &len_cli);
 	printf("valor de h:%d\n", h);
 	if (h == -1)
 		return -1;
 
-	/*
-	* Se devuelve el descriptor en el que esta "enchufado" el cliente.
-	*/
 	return h;
 }
 
@@ -69,8 +59,6 @@ new_client(int server, int *cfd, int *ncli){
 	cfd[*ncli] = accept_client(server);
 	(*ncli)++;
 
-	/* Si se ha superado el maximo de clientes, se cierra la conexión,
-	 * se deja todo como estaba y se vuelve. */
 	if ((*ncli) >= MAXCLIENTS)
 	{
 		close (cfd[(*ncli) -1]);
@@ -78,16 +66,6 @@ new_client(int server, int *cfd, int *ncli){
 		return;
 	}
 }
-
-// void
-// imprimir_array(int *array){
-// 	int j;
-
-// 	for(j = 0; j < 5; j++){
-// 		printf("client[%d]: %d\n",j+1, array[j] );
-// 	}
-// }
-
 
 void
 reorganize_clients_array(int *array, int *n)
@@ -148,7 +126,6 @@ main(void)
 	while(1){
 		reorganize_clients_array(clients, &nclients);
 
-		/* Set up polling using select. */
 		FD_ZERO(&fds);
 		FD_SET(server->s, &fds);
 
@@ -166,7 +143,6 @@ main(void)
 		{
 			if (FD_ISSET(clients[i], &fds))
 			{
-				sleep(2);
 				aCli->s = clients[i];
 				// msg = ipc_recv(aCli);	
 			    msg = ipc_recv(aCli);
