@@ -9,6 +9,8 @@
 #define check(expr, ...)  ((void) (((expr) >= 0)    || abort(__VA_ARGS__)) )
 #define checkp(expr, ...) ((void) (((expr) != NULL) || abort(__VA_ARGS__)) )
 
+#define debug(...) ((void) (printf(__VA_ARGS__), fflush(0)))
+
 int streq(char *s1, char *s2);
 
 char *filepath(char *path);

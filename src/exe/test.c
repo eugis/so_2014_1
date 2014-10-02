@@ -8,7 +8,6 @@
 #include "../../inc/actions.h"
 #include "../../inc/utils.h"
 
-#define debug(...) ((void) (printf(__VA_ARGS__), fflush(0)))
 
 void server(char *address) {
     debug("\t\tS: listening on %s (PID %d)\n", address, getpid());
