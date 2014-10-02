@@ -9,6 +9,7 @@ O_FILES = $(patsubst src/%.c, obj/%.o, $(C_FILES))
 build: bin obj $(O_FILES)
 	gcc -o bin/test $(O_FILES) $(C_FLAGS) src/exe/test.c
 	gcc -o bin/reset $(O_FILES) $(C_FLAGS) src/exe/reset.c
+	gcc -o bin/client $(O_FILES) $(C_FLAGS) src/exe/client.c
 
 	rm -r obj
 

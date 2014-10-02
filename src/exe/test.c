@@ -2,18 +2,19 @@
 #include <stdlib.h>
 #include <sys/types.h>
 #include <unistd.h>
+#include <libgen.h>
 
 #include "../../inc/ipc.h"
 #include "../../inc/actions.h"
 #include "../../inc/utils.h"
 
 
-void server() {
+void server(char *address) {
     printf("S %d\n", getpid());
 
     database_t *database = db_open("db");
-    ipc_t* ipc = ipc_open("./tmp");
-    message_t* msg;
+    ipc_t *ipc = ipc_listen(address);
+    message_t *msg;
 
     msg = ipc_recv(ipc);
     res_movie_list(ipc, database, msg->sender);
@@ -36,25 +37,25 @@ void server() {
 }
 
 
-void client(int server_pid) {
+void client(char *address) {
     int client = getpid();
     printf("C %d\n", client);
 
-    ipc_t* ipc = ipc_open("./tmp");
+    ipc_t* ipc = ipc_connect(address);
     message_t *msg;
 
-    req_movie_list(ipc, server_pid);
+    req_movie_list(ipc);
     msg = ipc_recv(ipc);
     han_movie_list((res_movie_list_t*) &(msg->content));
     free(msg);
 
-    req_buy_ticket(ipc, server_pid, 1);
+    req_buy_ticket(ipc, 1);
     msg = ipc_recv(ipc);
     ticket_t ticket = ((res_buy_ticket_t*) &(msg->content))->ticket;
     han_buy_ticket((res_buy_ticket_t*) &(msg->content));
     free(msg);
 
-    req_get_ticket(ipc, server_pid, ticket);
+    req_get_ticket(ipc, ticket);
     msg = ipc_recv(ipc);
     han_get_ticket((res_get_ticket_t*) &(msg->content));
     free(msg);
@@ -63,23 +64,13 @@ void client(int server_pid) {
 }
 
 
-void test() {
-    database_t *database = db_open("db");
-
-    ticket_t ticket = db_buy_ticket(database, 1);
-    printf("Ticket: %d\n", ticket);
-
-    printf("Movie: %s\n", db_get_ticket(database, ticket)->name);
-
-    db_close(database);
-}
-
-
 int main() {
-    int server_pid = getpid();
+    char *address = strdup("./tmp");
 
     if (fork() > 0)
-        server();
+        server(address);
     else
-        client(server_pid);
+        client(address);
+
+    free(address);
 }

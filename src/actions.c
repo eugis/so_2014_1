@@ -7,14 +7,28 @@
 #include "../inc/utils.h"
 
 
+int action_string_to_code(char *action) {
+    if (streq(action, "list"))
+        return ACTION_MOVIE_LIST;
+    else
+    if (streq(action, "buy"))
+        return ACTION_BUY_TICKET;
+    else
+    if (streq(action, "get"))
+        return ACTION_GET_TICKET;
+    else
+        return 0;
+}
+
+
 /* List movies: */
 
-void req_movie_list(ipc_t *ipc, uint16_t recipient) {
+void req_movie_list(ipc_t *ipc) {
     req_movie_list_t req = {
         .type = ACTION_MOVIE_LIST
     };
 
-    ipc_send(ipc, recipient, &req, sizeof(req));
+    ipc_send(ipc, 0, &req, sizeof(req));
 }
 
 void res_movie_list(ipc_t *ipc, database_t *db, uint16_t sender) {
@@ -39,13 +53,13 @@ void han_movie_list(res_movie_list_t *res) {
 
 /* Buy ticket: */
 
-void req_buy_ticket(ipc_t *ipc, uint16_t recipient, uint16_t movie_i) {
+void req_buy_ticket(ipc_t *ipc, uint16_t movie_i) {
     req_buy_ticket_t req = {
         .type    = ACTION_BUY_TICKET,
         .movie_i = movie_i
     };
 
-    ipc_send(ipc, recipient, &req, sizeof(req));
+    ipc_send(ipc, 0, &req, sizeof(req));
 }
 
 void res_buy_ticket(ipc_t *ipc, database_t *db, uint16_t sender, req_buy_ticket_t *req) {
@@ -69,13 +83,13 @@ void han_buy_ticket(res_buy_ticket_t *res) {
 
 /* Get ticket: */
 
-void req_get_ticket(ipc_t *ipc, uint16_t recipient, ticket_t ticket) {
+void req_get_ticket(ipc_t *ipc, ticket_t ticket) {
     req_get_ticket_t req = {
         .type   = ACTION_GET_TICKET,
         .ticket = ticket
     };
 
-    ipc_send(ipc, recipient, &req, sizeof(req));
+    ipc_send(ipc, 0, &req, sizeof(req));
 }
 
 void res_get_ticket(ipc_t *ipc, database_t *db, uint16_t sender, req_get_ticket_t *req) {

@@ -9,6 +9,7 @@
 #include <signal.h>
 #include <sys/types.h>
 #include <sys/stat.h>
+#include <libgen.h>
 
 
 static void signal_handler(int signum) {
@@ -72,16 +73,29 @@ static int fsize(FILE* file) {
 }
 
 
-ipc_t* ipc_open(char* root) {
+ipc_t *ipc_create(char *root) {
     ipc_t *ipc = (ipc_t*) malloc(sizeof(ipc_t));
 
-    ipc->id   = getpid();
     ipc->root = strdup(root);
 
     mkdir(root, 0777);
 
     install_signal_handler();
 
+    return ipc;
+}
+
+
+ipc_t *ipc_listen(char *address) {
+    ipc_t *ipc = ipc_create(address);
+    ipc->id = 0;
+    return ipc;
+}
+
+
+ipc_t *ipc_connect(char *address) {
+    ipc_t *ipc = ipc_create(address);
+    ipc->id = getpid();
     return ipc;
 }
 
