@@ -12,8 +12,12 @@
     #define IPC NONE /* silence redundant errors */
 #endif
 
+
+/* Add all IPCs here */
+
 #if IPC == FILESIG
     #include "ipc/filesig.h"
 #endif
+
 
 #endif

@@ -4,6 +4,7 @@
 
 #include <stdint.h>
 
+#define IPC_TEST_ADDRESS "./tmp"
 
 typedef struct {
     uint16_t id;

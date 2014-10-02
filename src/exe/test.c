@@ -65,7 +65,7 @@ void client(char *address) {
 
 
 int main() {
-    char *address = strdup("./tmp");
+    char *address = strdup(IPC_TEST_ADDRESS);
 
     if (fork() > 0)
         server(address);
