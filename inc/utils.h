@@ -11,4 +11,7 @@
 
 int streq(char *s1, char *s2);
 
+char *filepath(char *path);
+char *filename(char *path);
+
 #endif

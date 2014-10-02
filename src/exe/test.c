@@ -8,32 +8,37 @@
 #include "../../inc/actions.h"
 #include "../../inc/utils.h"
 
+#define debug(...) ((void) (printf(__VA_ARGS__), fflush(0)))
 
 void server(char *address) {
-    printf("S %d\n", getpid());
+    debug("\t\tS: listening on %s (PID %d)\n", address, getpid());
 
     database_t *database = db_open("db");
     ipc_t *ipc = ipc_listen(address);
     message_t *msg;
 
+    debug("\t\tS: expecting LIST\n");
+
     msg = ipc_recv(ipc);
     res_movie_list(ipc, database, msg->sender);
     free(msg);
 
+    debug("\t\tS: expecting BUY\n");
     msg = ipc_recv(ipc);
     res_buy_ticket(ipc, database, msg->sender, (req_buy_ticket_t*) &(msg->content));
     free(msg);
 
+    debug("\t\tS: expecting GET\n");
     msg = ipc_recv(ipc);
     res_get_ticket(ipc, database, msg->sender, (req_get_ticket_t*) &(msg->content));
     free(msg);
 
-    // printf("S %p\n", msg);
-    // printf("S %d, %d\n", msg->sender, msg->content_length);
-    // printf("S %s\n", msg->content);
+    debug("\t\tS: closing\n");
 
     ipc_close(ipc);
     db_close(database);
+
+    debug("\t\tS: exiting\n");
 }
 
 
@@ -65,12 +70,13 @@ void client(char *address) {
 
 
 int main() {
-    char *address = strdup(IPC_TEST_ADDRESS);
+    int pid = getpid();
+
+    char address[150];
+    sprintf(address, "./tmp/%d", pid);
 
     if (fork() > 0)
-        server(address);
+        server("./tmp");
     else
         client(address);
-
-    free(address);
 }

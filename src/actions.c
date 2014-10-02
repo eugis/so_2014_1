@@ -28,7 +28,7 @@ void req_movie_list(ipc_t *ipc) {
         .type = ACTION_MOVIE_LIST
     };
 
-    ipc_send(ipc, 0, &req, sizeof(req));
+    ipc_send(ipc, ipc->server_id, &req, sizeof(req));
 }
 
 void res_movie_list(ipc_t *ipc, database_t *db, uint16_t sender) {
@@ -59,7 +59,7 @@ void req_buy_ticket(ipc_t *ipc, uint16_t movie_i) {
         .movie_i = movie_i
     };
 
-    ipc_send(ipc, 0, &req, sizeof(req));
+    ipc_send(ipc, ipc->server_id, &req, sizeof(req));
 }
 
 void res_buy_ticket(ipc_t *ipc, database_t *db, uint16_t sender, req_buy_ticket_t *req) {
@@ -89,7 +89,7 @@ void req_get_ticket(ipc_t *ipc, ticket_t ticket) {
         .ticket = ticket
     };
 
-    ipc_send(ipc, 0, &req, sizeof(req));
+    ipc_send(ipc, ipc->server_id, &req, sizeof(req));
 }
 
 void res_get_ticket(ipc_t *ipc, database_t *db, uint16_t sender, req_get_ticket_t *req) {

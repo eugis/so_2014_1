@@ -1,4 +1,5 @@
 #include "../../inc/ipc/filesig.h"
+#include "../../inc/utils.h"
 
 
 #include <stdio.h>
@@ -76,8 +77,7 @@ static int fsize(FILE* file) {
 ipc_t *ipc_create(char *root) {
     ipc_t *ipc = (ipc_t*) malloc(sizeof(ipc_t));
 
-    ipc->root = strdup(root);
-
+    ipc->root = root;
     mkdir(root, 0777);
 
     install_signal_handler();
@@ -86,16 +86,21 @@ ipc_t *ipc_create(char *root) {
 }
 
 
-ipc_t *ipc_listen(char *address) {
-    ipc_t *ipc = ipc_create(address);
-    ipc->id = 0;
+ipc_t *ipc_listen(char *dir) {
+    ipc_t *ipc = ipc_create(strdup(dir));
+
+    ipc->server_id = ipc->id = getpid();
+
     return ipc;
 }
 
 
-ipc_t *ipc_connect(char *address) {
-    ipc_t *ipc = ipc_create(address);
+ipc_t *ipc_connect(char *file) {
+    ipc_t *ipc = ipc_create(filepath(file));
+
     ipc->id = getpid();
+    ipc->server_id = atoi(filename(file));
+
     return ipc;
 }
 

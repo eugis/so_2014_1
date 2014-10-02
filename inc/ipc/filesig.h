@@ -4,10 +4,10 @@
 
 #include <stdint.h>
 
-#define IPC_TEST_ADDRESS "./tmp"
 
 typedef struct {
     uint16_t id;
+    uint16_t server_id;
     char* root; /* inbox root directory */
 } ipc_t;
 
