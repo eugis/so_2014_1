@@ -30,6 +30,11 @@ int action_string_to_code(char *action);
 
 
 typedef struct {
+  uint8_t type;
+} req_any_t;
+
+
+typedef struct {
     uint8_t type;
 } req_movie_list_t;
 

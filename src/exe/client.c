@@ -22,7 +22,7 @@ int main(int argc, char** argv) {
 
     switch (action_code) {
         case ACTION_MOVIE_LIST:
-            check(argc == 3, "Usage: client <server address> list");
+            check(argc == 3, "Usage: client <server address> list\n");
 
             req_movie_list(ipc);
 
@@ -31,7 +31,7 @@ int main(int argc, char** argv) {
         break;
 
         case ACTION_BUY_TICKET:
-            check(argc == 4, "Usage: client <server address> buy <movie id>");
+            check(argc == 4, "Usage: client <server address> buy <movie id>\n");
 
             int movie_id = atoi(argv[3]);
 
@@ -42,7 +42,7 @@ int main(int argc, char** argv) {
         break;
 
         case ACTION_GET_TICKET:
-            check(argc == 4, "Usage: client <server address> get <ticket id>");
+            check(argc == 4, "Usage: client <server address> get <ticket id>\n");
 
             ticket_t ticket = atoi(argv[3]);
 

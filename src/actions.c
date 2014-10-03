@@ -77,7 +77,7 @@ void han_buy_ticket(res_buy_ticket_t *res) {
     if (res->ticket != 0)
         printf("Ticket: %d\n", res->ticket);
     else
-        printf("No se pudo comprar el ticket.");
+        printf("Tickets not available");
 }
 
 
@@ -104,5 +104,5 @@ void res_get_ticket(ipc_t *ipc, database_t *db, uint16_t sender, req_get_ticket_
 }
 
 void han_get_ticket(res_get_ticket_t *res) {
-    printf("Ticket para: %s\n", res->movie.name);
+    printf("Ticket for: %s\n", res->movie.name);
 }
