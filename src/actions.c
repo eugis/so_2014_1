@@ -47,7 +47,7 @@ void res_movie_list(ipc_t *ipc, database_t *db, uint16_t sender) {
 
 void han_movie_list(res_movie_list_t *res) {
     for (int i = 0; i < res->count; i++)
-        printf("[%d] %s\n", i, res->movies[i].name);
+        printf("[%d] %s\n", i + 1, res->movies[i].name);
 }
 
 
