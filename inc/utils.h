@@ -6,8 +6,7 @@
 #include <stdlib.h>
 
 #define abort(...) ( (printf(__VA_ARGS__), exit(1), 1 ) )
-#define check(expr, ...)  ((void) (((expr) >= 0)    || abort(__VA_ARGS__)) )
-#define checkp(expr, ...) ((void) (((expr) != NULL) || abort(__VA_ARGS__)) )
+#define check(expr, ...)  ((void) ((expr) || abort(__VA_ARGS__)) )
 
 #define debug(...) ((void) (printf(__VA_ARGS__), fflush(0)))
 

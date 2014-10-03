@@ -96,6 +96,9 @@ ipc_t *ipc_listen(char *dir) {
 
 
 ipc_t *ipc_connect(char *file) {
+    if (access(file, F_OK | R_OK) != 0)
+        return NULL;
+
     ipc_t *ipc = ipc_create(filepath(file));
 
     ipc->id = getpid();
