@@ -1,5 +1,6 @@
 #include <unistd.h>
 #include <sys/types.h>
+#include <signal.h>
 
 #include "../../inc/ipc.h"
 #include "../../inc/actions.h"
@@ -7,6 +8,37 @@
 
 
 int stop = 0; /* Setting this to true will stop the event loop */
+database_t *database;
+ipc_t *ipc;
+
+
+void setup(char *address) {
+    database = db_open("db");
+    ipc = ipc_listen(address);
+    printf("INFO  listening on %s (PID %d)\n", address, getpid());
+}
+
+void teardown() {
+    ipc_close(ipc);
+    db_close(database);
+    printf("INFO  exiting\n");
+    exit(0);
+}
+
+void exit_handler(int signum) {
+    teardown();
+}
+
+void install_exit_handler() {
+    struct sigaction handler = {
+        .sa_flags   = 0,
+        .sa_handler = exit_handler
+    };
+
+    sigaction(SIGINT, &handler, NULL);
+    sigaction(SIGTERM, &handler, NULL);
+}
+
 
 
 int main(int argc, char **argv) {
@@ -14,10 +46,9 @@ int main(int argc, char **argv) {
 
     char *address = argv[1];
 
-    printf("INFO  listening on %s (PID %d)\n", address, getpid());
+    setup(address);
+    install_exit_handler();
 
-    database_t *database = db_open("db");
-    ipc_t *ipc = ipc_listen(address);
     message_t *msg;
 
     while (! stop) {
@@ -45,8 +76,5 @@ int main(int argc, char **argv) {
         free(msg);
     }
 
-    ipc_close(ipc);
-    db_close(database);
-
-    printf("INFO  exiting\n");
+    teardown();
 }
