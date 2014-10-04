@@ -8,6 +8,7 @@
 #include <sys/stat.h>
 
 #include "../inc/database.h"
+#include "../inc/utils.h"
 
 
 void movie_init(movie_t* movie, char* name, char* time) {
@@ -58,7 +59,7 @@ void db_close(database_t *database) {
 
 static void db_lock(database_t *database, int type) {
     struct flock fl;
-        
+
     fl.l_type   = type;
     fl.l_whence = SEEK_SET;
     fl.l_start  = 0;
@@ -73,12 +74,12 @@ void db_rlock(database_t *database) {
 }
 
 void db_wlock(database_t *database) {
-    db_lock(database, F_WRLCK);  
+    db_lock(database, F_WRLCK);
 }
 
 void db_unlock(database_t *database) {
     struct flock fl;
-        
+
     fl.l_type   = F_UNLCK;
     fl.l_whence = SEEK_SET;
     fl.l_start  = 0;
@@ -103,17 +104,13 @@ movie_t* db_find(database_t *database, char *name) {
 ticket_t db_buy_ticket (database_t *database, int movie_i) {
     db_wlock(database);
 
+    if (movie_i < 0 || movie_i >= database->count)
+        return ERR_NO_SUCH_MOVIE;
+
     movie_t *movie = &(database->movies[movie_i]);
 
-    if (movie == NULL) {
-        printf("No existe %s\n", movie->name);
-        return 0;
-    }
-
-    if (movie->remaining_tickets == 0) {
-        printf("No hay mas tickets para %s\n", movie->name);
-        return 0;
-    }
+    if (movie->remaining_tickets == 0)
+        return ERR_NO_MORE_TICKETS;
 
     /* As long as they are unique, ticket number generation doesn't matter */
     ticket_t ticket =
@@ -141,7 +138,7 @@ movie_t* db_get_ticket(database_t *database, ticket_t ticket) {
                 movie = &(database->movies[movie_i]);
         }
     }
-    
+
     db_unlock(database);
     return movie;
 }

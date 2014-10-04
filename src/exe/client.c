@@ -4,6 +4,10 @@
 #include "../../inc/actions.h"
 
 
+/* Forward-declared, defined at the end for clarity */
+void handle_response(ipc_t *ipc);
+
+
 int main(int argc, char** argv) {
     check(argc >= 3, "Usage: client <server address> <action> [params...]\n");
 
@@ -18,16 +22,12 @@ int main(int argc, char** argv) {
     ipc_t *ipc = ipc_connect(server);
     check(ipc != NULL, "Failed to connect to %s\n", server);
 
-    message_t *msg;
 
     switch (action_code) {
         case ACTION_MOVIE_LIST:
             check(argc == 3, "Usage: client <server address> list\n");
 
             req_movie_list(ipc);
-
-            msg = ipc_recv(ipc);
-            han_movie_list((res_movie_list_t*) &(msg->content));
         break;
 
         case ACTION_BUY_TICKET:
@@ -36,9 +36,6 @@ int main(int argc, char** argv) {
             int movie_id = atoi(argv[3]);
 
             req_buy_ticket(ipc, movie_id - 1);
-
-            msg = ipc_recv(ipc);
-            han_buy_ticket((res_buy_ticket_t*) &(msg->content));
         break;
 
         case ACTION_GET_TICKET:
@@ -47,12 +44,34 @@ int main(int argc, char** argv) {
             ticket_t ticket = atoi(argv[3]);
 
             req_get_ticket(ipc, ticket);
+        break;
+    }
 
-            msg = ipc_recv(ipc);
-            han_get_ticket((res_get_ticket_t*) &(msg->content));
+    handle_response(ipc);
+    ipc_close(ipc);
+}
+
+void handle_response(ipc_t *ipc) {
+    message_t *msg = ipc_recv(ipc);
+    res_any_t *res = (void*) &(msg->content);
+
+    switch (res->type) {
+        case ACTION_MOVIE_LIST:
+            han_movie_list((res_movie_list_t*) res);
+        break;
+
+        case ACTION_BUY_TICKET:
+            han_buy_ticket((res_buy_ticket_t*) res);
+        break;
+
+        case ACTION_GET_TICKET:
+            han_get_ticket((res_get_ticket_t*) res);
+        break;
+
+        case ACTION_ERROR:
+            han_error((res_error_t*) res);
         break;
     }
 
     free(msg);
-    ipc_close(ipc);
 }

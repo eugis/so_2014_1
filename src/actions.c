@@ -21,6 +21,38 @@ int action_string_to_code(char *action) {
 }
 
 
+/* Error handling: */
+
+void res_error(ipc_t *ipc, uint16_t sender, int32_t code) {
+    res_error_t err = {
+        .type = ACTION_ERROR,
+        .code = code
+    };
+
+    ipc_send(ipc, sender, &err, sizeof(err));
+}
+
+void han_error(res_error_t *err) {
+    switch (err->code) {
+        case ERR_NO_SUCH_MOVIE:
+            printf("No such movie\n");
+        break;
+
+        case ERR_NO_SUCH_TICKET:
+            printf("No such ticket\n");
+        break;
+
+        case ERR_NO_MORE_TICKETS:
+            printf("No more tickets available\n");
+        break;
+
+        default:
+            printf("Unexpected error %d\n", err->code);
+        break;
+    }
+}
+
+
 /* List movies: */
 
 void req_movie_list(ipc_t *ipc) {
@@ -65,12 +97,16 @@ void req_buy_ticket(ipc_t *ipc, uint16_t movie_i) {
 void res_buy_ticket(ipc_t *ipc, database_t *db, uint16_t sender, req_buy_ticket_t *req) {
     ticket_t ticket = db_buy_ticket(db, req->movie_i);
 
-    res_buy_ticket_t res = {
-        .type   = ACTION_BUY_TICKET,
-        .ticket = ticket
-    };
+    if (ticket > 0) {
+        res_buy_ticket_t res = {
+            .type   = ACTION_BUY_TICKET,
+            .ticket = ticket
+        };
 
-    ipc_send(ipc, sender, &res, sizeof(res));
+        ipc_send(ipc, sender, &res, sizeof(res));
+
+    } else
+        res_error(ipc, sender, ticket); /* `ticket` holds an error code */
 }
 
 void han_buy_ticket(res_buy_ticket_t *res) {
@@ -95,12 +131,16 @@ void req_get_ticket(ipc_t *ipc, ticket_t ticket) {
 void res_get_ticket(ipc_t *ipc, database_t *db, uint16_t sender, req_get_ticket_t *req) {
     movie_t *movie = db_get_ticket(db, req->ticket);
 
-    res_get_ticket_t res = {
-        .type  = ACTION_BUY_TICKET,
-        .movie = *movie
-    };
+    if (movie != NULL) {
+        res_get_ticket_t res = {
+            .type  = ACTION_GET_TICKET,
+            .movie = *movie
+        };
 
-    ipc_send(ipc, sender, &res, sizeof(res));
+        ipc_send(ipc, sender, &res, sizeof(res));
+
+    } else
+        res_error(ipc, sender, ERR_NO_SUCH_TICKET);
 }
 
 void han_get_ticket(res_get_ticket_t *res) {

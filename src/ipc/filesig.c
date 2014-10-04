@@ -109,6 +109,10 @@ ipc_t *ipc_connect(char *file) {
 
 
 void ipc_close(ipc_t* ipc) {
+    char path[250];
+    sprintf(path, "%s/%d", ipc->root, ipc->id);
+    unlink(path);
+
     free(ipc->root);
     free(ipc);
 }

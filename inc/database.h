@@ -6,11 +6,15 @@
 #include <stdio.h>
 #include <fcntl.h>
 
-#define MOVIE_MAX_TICKETS 100
+#define MOVIE_MAX_TICKETS 2
 #define MOVIE_NAME_LENGTH 100
 #define MOVIE_TIME_LENGTH 100
 
-typedef uint32_t ticket_t;
+#define ERR_NO_SUCH_MOVIE   -1
+#define ERR_NO_SUCH_TICKET  -2
+#define ERR_NO_MORE_TICKETS -3
+
+typedef int32_t ticket_t;
 
 typedef struct movie {
     char name[MOVIE_NAME_LENGTH];

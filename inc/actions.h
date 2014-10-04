@@ -25,6 +25,7 @@
 #define ACTION_MOVIE_LIST 1
 #define ACTION_BUY_TICKET 2
 #define ACTION_GET_TICKET 3
+#define ACTION_ERROR 59
 
 int action_string_to_code(char *action);
 
@@ -32,6 +33,18 @@ int action_string_to_code(char *action);
 typedef struct {
   uint8_t type;
 } req_any_t;
+
+typedef struct {
+  uint8_t type;
+} res_any_t;
+
+
+typedef struct {
+  uint8_t type;
+  int32_t code;
+} res_error_t;
+
+void han_error(res_error_t *err);
 
 
 typedef struct {

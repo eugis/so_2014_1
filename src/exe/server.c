@@ -15,13 +15,13 @@ ipc_t *ipc;
 void setup(char *address) {
     database = db_open("db");
     ipc = ipc_listen(address);
-    printf("INFO  listening on %s (PID %d)\n", address, getpid());
+    debug("Listening on %s (PID %d)\n", address, getpid());
 }
 
 void teardown() {
     ipc_close(ipc);
     db_close(database);
-    printf("INFO  exiting\n");
+    debug("Exiting\n");
     exit(0);
 }
 
@@ -70,7 +70,7 @@ int main(int argc, char **argv) {
             break;
 
             default:
-                printf("ERROR bad req: %d is not an action type", req->type);
+                debug("ERROR bad req: %d is not an action type\n", req->type);
         }
 
         free(msg);
