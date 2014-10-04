@@ -1,8 +1,8 @@
 #include "../inc/ipc.h"
 
-#if IPC == FILESIG
+#if defined(IPC_FILESIG)
     #include "ipc/filesig.c"
 
-#elif IPC == SOCKETS
+#elif defined(IPC_SOCKETS)
     #include "ipc/sockets.c"
 #endif

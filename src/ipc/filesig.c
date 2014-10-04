@@ -1,7 +1,6 @@
 #include "../../inc/ipc/filesig.h"
 #include "../../inc/utils.h"
 
-
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
