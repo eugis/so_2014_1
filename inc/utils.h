@@ -5,6 +5,11 @@
 #include <string.h>
 #include <stdlib.h>
 
+#define CONCAT1(x) x ## 1
+#define CONCAT2(x) CONCAT1(x)
+#define IS_EMPTY(x) CONCAT2(x) == 1
+
+
 #define abort(...) ( (printf(__VA_ARGS__), exit(1), 1 ) )
 #define check(expr, ...)  ((void) ((expr) || abort(__VA_ARGS__)) )
 

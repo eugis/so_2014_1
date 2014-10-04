@@ -12,13 +12,6 @@ typedef struct {
 } ipc_t;
 
 
-typedef struct {
-    uint16_t sender;
-    uint16_t content_length;
-    char content[];
-} message_t;
-
-
 ipc_t *ipc_listen(char *address);
 ipc_t *ipc_connect(char *address);
 

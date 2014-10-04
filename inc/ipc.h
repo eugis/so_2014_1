@@ -1,9 +1,9 @@
 #ifndef __IPC_H__
 #define __IPC_H__
 
-#define CONCAT1(x) x ## 1
-#define CONCAT2(x) CONCAT1(x)
-#define IS_EMPTY(x) CONCAT2(x) == 1
+#include <stdint.h>
+#include "utils.h"
+
 
 #if !defined(IPC) || IS_EMPTY(IPC)
     #error No IPC selected (compile with -DIPC)
@@ -13,10 +13,19 @@
 #endif
 
 
+typedef struct {
+    uint16_t sender;
+    uint16_t content_length;
+    char content[];
+} message_t;
+
+
 /* Add all IPCs here */
 
 #if IPC == FILESIG
     #include "ipc/filesig.h"
+#elif IPC == SOCKETS
+    #include "ipc/sockets.h"
 #endif
 
 
