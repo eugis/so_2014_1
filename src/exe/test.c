@@ -76,6 +76,6 @@ int main() {
 
     if (fork() > 0)
         server("./tmp");
-    else {}
-        // client(address);
+    else
+        client(address);
 }
