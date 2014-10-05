@@ -68,7 +68,7 @@ dec(int numsem)
   
   sb.sem_num = numsem - 1;
   sb.sem_op = -1;
-  sb.sem_flg = 0;//SEM_UNDO;
+  sb.sem_flg = 0;
 
   if( semop(semid,&sb,1) == -1 ) 
     fatal("semop failure");
@@ -81,7 +81,7 @@ inc(int numsem)
 
   sb.sem_num = numsem - 1;
   sb.sem_op = 1;
-  sb.sem_flg = 0;//SEM_UNDO;
+  sb.sem_flg = 0;
   
   if( semop(semid,&sb,1) == -1 ) 
     fatal("semop failure");
@@ -128,6 +128,8 @@ ipc_t *ipc_connect(char *file) {
 void
 ipc_close(ipc_t *ipc){
   if(ipc->id == ipc->server_id){ // is server?
+    sleep(1);  // It is used in test.c. Server closes
+               // semaphores before client can use them.
     close_mutex();
     free_memory();
   }

@@ -32,10 +32,10 @@ void server(char *address) {
     res_get_ticket(ipc, database, msg->sender, (req_get_ticket_t*) &(msg->content));
     free(msg);
 
-    sleep(1);
-	
+    
     debug("\t\tS: closing\n");
 
+    // sleep(1);
     ipc_close(ipc);
     db_close(database);
 

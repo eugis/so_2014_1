@@ -56,19 +56,15 @@ close_mutex(void){
 
   if ( sem_close(sem1) != 0 ) exit_status = EXIT_FAILURE;
   if ( sem_unlink("/sem1") != 0) exit_status = EXIT_FAILURE;
-  // if ( sem_destroy(sem1) != 0 ) exit_status = EXIT_FAILURE; // revisar
   
   if ( sem_close(sem2) != 0 ) exit_status = EXIT_FAILURE;
   if ( sem_unlink("/sem2") != 0) exit_status = EXIT_FAILURE;
-  // if ( sem_destroy(sem2) != 0 ) exit_status = EXIT_FAILURE; // revisar
 
   if ( sem_close(sem3) != 0 ) exit_status = EXIT_FAILURE;
   if ( sem_unlink("/sem3") != 0) exit_status = EXIT_FAILURE;
-  // if ( sem_destroy(sem3) != 0 ) exit_status = EXIT_FAILURE; // revisar
 
   if ( sem_close(sem4) != 0 ) exit_status = EXIT_FAILURE;
   if ( sem_unlink("/sem4") != 0) exit_status = EXIT_FAILURE;
-  // if ( sem_destroy(sem3) != 0 ) exit_status = EXIT_FAILURE; // revisar
   
   return exit_status;
 }
