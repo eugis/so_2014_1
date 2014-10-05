@@ -1,4 +1,5 @@
-C_FLAGS = -std=c99 -pedantic -Wall -Wextra -g -Wno-unused-parameter -D_GNU_SOURCE -D_POSIX_C_SOURCE -DIPC_$(IPC)
+C_FLAGS = -std=c99 -pedantic -Wall -Wextra -g -Wno-unused-parameter -D_GNU_SOURCE -D_POSIX_C_SOURCE -DIPC_$(IPC) -lpthread -lrt
+#-lpthread -lrt added by matias (shared memory)
 
 C_FILES = $(wildcard src/*.c)
 H_FILES = $(wildcard src/*.h)
