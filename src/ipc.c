@@ -9,4 +9,7 @@
 #elif defined(IPC_SHMPOSIX)
     #include "ipc/shmposix.c"
 
+#elif defined(IPC_SHMSYSTEMV)
+    #include "ipc/shmsystemv.c"
+
 #endif
