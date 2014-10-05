@@ -20,6 +20,9 @@ typedef struct {
 #elif defined(IPC_SOCKETS)
     #include "ipc/sockets.h"
 
+#elif defined(IPC_SHMEM)
+    #include "ipc/shmem.h"
+
 #else
     #error No IPC selected (use make IPC=[FILESIG|SOCKETS])
 #endif

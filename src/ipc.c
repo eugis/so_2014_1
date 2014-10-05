@@ -5,4 +5,7 @@
 
 #elif defined(IPC_SOCKETS)
     #include "ipc/sockets.c"
+
+#elif defined(IPC_SHMEM)
+    #include "ipc/shmem.c"
 #endif

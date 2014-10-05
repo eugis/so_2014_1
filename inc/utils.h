@@ -1,9 +1,9 @@
 #ifndef __UTILS_H__
 #define __UTILS_H__
 
-#include <assert.h>
 #include <string.h>
 #include <stdlib.h>
+#include <stdio.h>
 
 #define CONCAT1(x) x ## 1
 #define CONCAT2(x) CONCAT1(x)

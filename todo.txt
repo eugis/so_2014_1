@@ -1,0 +1,17 @@
+# Indispensable
+
+- MQueues
+
+
+# Requerido
+
+- Sockets fuera de localhost
+- Cliente sin IPC
+
+
+# Por favor
+
+- Chequeo de errores (FILESIG especialmente no tiene ni comentarios)
+- Interfaz de aplicacion un poco mas lively
+
+
