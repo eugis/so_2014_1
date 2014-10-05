@@ -24,6 +24,77 @@ fatal(char *s)
     exit(1);
 }
 
+
+/*******************************************************/
+/**********************SEMAPHORES***********************/
+/*******************************************************/
+
+static sem_t *sem1;
+static sem_t *sem2;
+static sem_t *sem3;
+static sem_t *sem4;
+
+void
+init_mutex(void)
+{
+  if ( !(sem1 = sem_open("/sem1", O_RDWR | O_CREAT, 0666, 0)) )
+      fatal("sem_open1 failure");
+
+  if ( !(sem2 = sem_open("/sem2",O_RDWR | O_CREAT, 0666, 0)) )
+      fatal("sem_open2 failure");
+
+  if ( !(sem3 = sem_open("/sem3",O_RDWR | O_CREAT, 0666, 0)) )
+      fatal("sem_open3 failure");
+
+  if ( !(sem4 = sem_open("/sem4",O_RDWR | O_CREAT, 0666, 0)) )
+      fatal("sem_open4 failure");  
+}
+
+int
+close_mutex(void){
+  int exit_status = EXIT_SUCCESS;
+
+  if ( sem_close(sem1) != 0 ) exit_status = EXIT_FAILURE;
+  if ( sem_unlink("/sem1") != 0) exit_status = EXIT_FAILURE;
+  // if ( sem_destroy(sem1) != 0 ) exit_status = EXIT_FAILURE; // revisar
+  
+  if ( sem_close(sem2) != 0 ) exit_status = EXIT_FAILURE;
+  if ( sem_unlink("/sem2") != 0) exit_status = EXIT_FAILURE;
+  // if ( sem_destroy(sem2) != 0 ) exit_status = EXIT_FAILURE; // revisar
+
+  if ( sem_close(sem3) != 0 ) exit_status = EXIT_FAILURE;
+  if ( sem_unlink("/sem3") != 0) exit_status = EXIT_FAILURE;
+  // if ( sem_destroy(sem3) != 0 ) exit_status = EXIT_FAILURE; // revisar
+
+  if ( sem_close(sem4) != 0 ) exit_status = EXIT_FAILURE;
+  if ( sem_unlink("/sem4") != 0) exit_status = EXIT_FAILURE;
+  // if ( sem_destroy(sem3) != 0 ) exit_status = EXIT_FAILURE; // revisar
+  
+  return exit_status;
+}
+
+void
+dec(int numsem)
+{
+  switch(numsem){
+    case CLIENT_WRITE: sem_wait(sem1); break;
+    case SERVER_READ : sem_wait(sem2); break;
+    case CLIENT_READ : sem_wait(sem3); break;
+    case SERVER_WRITE : sem_wait(sem4); break;
+  }
+}
+
+void
+inc(int numsem)
+{
+  switch(numsem){
+    case CLIENT_WRITE: sem_post(sem1); break;
+    case SERVER_READ : sem_post(sem2); break;
+    case CLIENT_READ : sem_post(sem3); break;
+    case SERVER_WRITE : sem_post(sem4); break;
+  }
+}
+
 /*******************************************************/
 /*********************IPC FUNCTION**********************/
 /*******************************************************/
@@ -133,76 +204,6 @@ ipc_recv(ipc_t *ipc)
   return msg;
 }
 
-
-/*******************************************************/
-/**********************SEMAPHORES***********************/
-/*******************************************************/
-
-static sem_t *sem1;
-static sem_t *sem2;
-static sem_t *sem3;
-static sem_t *sem4;
-
-void
-init_mutex(void)
-{
-  if ( !(sem1 = sem_open("/sem1", O_RDWR | O_CREAT, 0666, 1)) )
-      fatal("sem_open1 failure");
-
-  if ( !(sem2 = sem_open("/sem2", O_RDWR | O_CREAT, 0666, 0)) )
-      fatal("sem_open2 failure");
-
-  if ( !(sem3 = sem_open("/sem3", O_RDWR | O_CREAT, 0666, 0)) )
-      fatal("sem_open3 failure");
-
-  if ( !(sem4 = sem_open("/sem4", O_RDWR | O_CREAT, 0666, 0)) )
-      fatal("sem_open4 failure");  
-}
-
-int
-close_mutex(void){
-	int exit_status = EXIT_SUCCESS;
-
-	if ( sem_close(sem1) != 0 ) exit_status = EXIT_FAILURE;
-	if ( sem_unlink("/sem1") != 0) exit_status = EXIT_FAILURE;
-	// if ( sem_destroy(sem1) != 0 ) exit_status = EXIT_FAILURE; // revisar
-	
-	if ( sem_close(sem2) != 0 ) exit_status = EXIT_FAILURE;
-	if ( sem_unlink("/sem2") != 0) exit_status = EXIT_FAILURE;
-	// if ( sem_destroy(sem2) != 0 ) exit_status = EXIT_FAILURE; // revisar
-
-	if ( sem_close(sem3) != 0 ) exit_status = EXIT_FAILURE;
-	if ( sem_unlink("/sem3") != 0) exit_status = EXIT_FAILURE;
-	// if ( sem_destroy(sem3) != 0 ) exit_status = EXIT_FAILURE; // revisar
-
-  if ( sem_close(sem4) != 0 ) exit_status = EXIT_FAILURE;
-  if ( sem_unlink("/sem4") != 0) exit_status = EXIT_FAILURE;
-  // if ( sem_destroy(sem3) != 0 ) exit_status = EXIT_FAILURE; // revisar
-	
-	return exit_status;
-}
-
-void
-dec(int numsem)
-{
-  switch(numsem){
-    case CLIENT_WRITE: sem_wait(sem1); break;
-    case SERVER_READ : sem_wait(sem2); break;
-    case CLIENT_READ : sem_wait(sem3); break;
-    case SERVER_WRITE : sem_wait(sem4); break;
-  }
-}
-
-void
-inc(int numsem)
-{
-  switch(numsem){
-    case CLIENT_WRITE: sem_post(sem1); break;
-    case SERVER_READ : sem_post(sem2); break;
-    case CLIENT_READ : sem_post(sem3); break;
-    case SERVER_WRITE : sem_post(sem4); break;
-  }
-}
 /*******************************************************/
 /********************SHARED MEMORY**********************/
 /*******************************************************/
