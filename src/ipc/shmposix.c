@@ -104,7 +104,7 @@ ipc_listen(char *address){
   ipc->server_id = ipc->id = getpid();
   id = ipc->id;
   server_id = ipc->server_id;
-  ipc->addr = address + 1; // /addr used in shm_unlink function
+  ipc->addr = address + 2; // /addr used in shm_unlink function
   addr = ipc->addr;
   ipc->shared_memory = get_memory(address + 2, ipc);
   install_signal_handler();
@@ -174,6 +174,7 @@ ipc_send(ipc_t *ipc, uint16_t recipient, void *message, uint16_t length)
   memcpy(&(ipc->shared_memory)->content_length, &length, sizeof(length));
   memcpy((ipc->shared_memory)->content, message, length);  
 
+  sleep(1);
   if(ipc->id == ipc->server_id) inc(CLIENT_READ);
   if(ipc->id != ipc->server_id) inc(SERVER_READ);
 }
@@ -198,6 +199,7 @@ ipc_recv(ipc_t *ipc)
   msg->sender = sender;
   msg->content_length = length;
 
+  sleep(1);
   if(ipc->id == ipc->server_id) inc(SERVER_WRITE);
   if(ipc->id != ipc->server_id) inc(CLIENT_WRITE);
 

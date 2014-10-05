@@ -60,20 +60,6 @@ close_mutex(void){
   exit_status = (semctl(semid, 0, IPC_RMID) != 0);
   return exit_status;
 }
-
-// BORRAR ANTES DE ENTREGAR
-void
-values(){
-  int valor = semctl (semid,0,GETVAL);
-  printf("valor de sem1 es %d\n", valor);
-  valor = semctl (semid,1,GETVAL);
-  printf("valor de sem2 es %d\n", valor);
-  valor = semctl (semid,2,GETVAL);
-  printf("valor de sem3 es %d\n", valor);
-  valor = semctl (semid,3,GETVAL);
-  printf("valor de sem4 es %d\n", valor);
-}
-
  
 void
 dec(int numsem)
@@ -86,7 +72,6 @@ dec(int numsem)
 
   if( semop(semid,&sb,1) == -1 ) 
     fatal("semop failure");
-// values();
 }
 
 void
@@ -101,7 +86,6 @@ inc(int numsem)
   if( semop(semid,&sb,1) == -1 ) 
     fatal("semop failure");
 
-// values();
 }
 
 
@@ -121,7 +105,7 @@ ipc_listen(char *address){
 
   open_mutex(key);
   init_mutex(); // semaphores 0 0 0 0
-  // values();
+
   return ipc;
 }
 
@@ -137,7 +121,7 @@ ipc_t *ipc_connect(char *file) {
   ipc->shared_memory = get_memory(f + 2, ipc);
   install_signal_handler();
   open_mutex(key);
-  // values();
+
   return ipc;
 }
 
@@ -186,7 +170,7 @@ ipc_send(ipc_t *ipc, uint16_t recipient, void *message, uint16_t length)
   memcpy(&(ipc->shared_memory)->sender, &ipc->id, sizeof(ipc->id));
   memcpy(&(ipc->shared_memory)->content_length, &length, sizeof(length));
   memcpy((ipc->shared_memory)->content, message, length);      
-
+  sleep(1);
   if(ipc->id == ipc->server_id) inc(CLIENT_READ);
   if(ipc->id != ipc->server_id) inc(SERVER_READ);
 }
@@ -210,7 +194,7 @@ ipc_recv(ipc_t *ipc)
 
   msg->sender = sender;
   msg->content_length = length;
-
+  sleep(1);
   if(ipc->id == ipc->server_id) inc(SERVER_WRITE);
   if(ipc->id != ipc->server_id) inc(CLIENT_WRITE);
 
