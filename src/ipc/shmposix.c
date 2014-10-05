@@ -15,8 +15,7 @@
 #include <unistd.h>
 #include <signal.h>
 
-
-static int ip, server_id;
+static int id, server_id;
 static char *addr;
 void
 fatal(char *s)
@@ -30,27 +29,32 @@ fatal(char *s)
 /*******************************************************/
 ipc_t*
 ipc_listen(char *address){
-    ipc_t *ipc = (ipc_t*) malloc(sizeof(ipc_t));
-    ipc->server_id = ipc->id = getpid();
-    ipc->addr = address + 1; // /addr used in shm_unlink function
-    addr = ipc->addr;
-    ipc->shared_memory = get_memory(address + 2, ipc);
-    install_signal_handler();
-    init_mutex(); // semaphores 0 0 0 0
-    inc(CLIENT_WRITE);
-    return ipc;
+  ipc_t *ipc = (ipc_t*) malloc(sizeof(ipc_t));
+  ipc->server_id = ipc->id = getpid();
+  id = ipc->id;
+  server_id = ipc->server_id;
+  ipc->addr = address + 1; // /addr used in shm_unlink function
+  addr = ipc->addr;
+  ipc->shared_memory = get_memory(address + 2, ipc);
+  install_signal_handler();
+  init_mutex(); // semaphores 0 0 0 0
+  inc(CLIENT_WRITE);
+  return ipc;
 }
 
-ipc_t *ipc_connect(char *file) {
-    ipc_t *ipc = (ipc_t*) malloc(sizeof(ipc_t));
-    ipc->id = getpid();
-    ipc->server_id = atoi(filename(file));
-    char *f = filepath(file);
-    ipc->addr = f + 1;
-    ipc->shared_memory = get_memory(f + 2, ipc);
-    install_signal_handler();
-    init_mutex();
-    return ipc;
+ipc_t *
+ipc_connect(char *file) {
+  ipc_t *ipc = (ipc_t*) malloc(sizeof(ipc_t));
+  ipc->id = getpid();
+  ipc->server_id = atoi(filename(file));
+  id = ipc->id;
+  server_id = ipc->server_id;
+  char *f = filepath(file);
+  ipc->addr = f + 1;
+  ipc->shared_memory = get_memory(f + 2, ipc);
+  install_signal_handler();
+  init_mutex();
+  return ipc;
 }
 
 void
@@ -82,7 +86,7 @@ install_signal_handler(){
 
 void
 handle_signal(int signal){
-  if(ip == server_id){
+  if(id == server_id){
     close_mutex();
     free_memory(addr);
   }
@@ -94,10 +98,10 @@ ipc_send(ipc_t *ipc, uint16_t recipient, void *message, uint16_t length)
 {
   if(ipc->id == ipc->server_id) dec(SERVER_WRITE);
   if(ipc->id != ipc->server_id) dec(CLIENT_WRITE);
-  
-  write(ipc->shared_memory, &(ipc->id),sizeof(ipc->id));
-  write(ipc->shared_memory, &length,sizeof(length));
-  write(ipc->shared_memory, message,length);
+
+  memcpy(&(ipc->shared_memory)->sender, &ipc->id, sizeof(ipc->id));
+  memcpy(&(ipc->shared_memory)->content_length, &length, sizeof(length));
+  memcpy((ipc->shared_memory)->content, message, length);  
 
   if(ipc->id == ipc->server_id) inc(CLIENT_READ);
   if(ipc->id != ipc->server_id) inc(SERVER_READ);
@@ -112,11 +116,13 @@ ipc_recv(ipc_t *ipc)
   if(ipc->id == ipc->server_id) dec(SERVER_READ);
   if(ipc->id != ipc->server_id) dec(CLIENT_READ);
 
-  read(ipc->shared_memory, &sender, sizeof(sender));
-  read(ipc->shared_memory, &length, sizeof(length));
+  memcpy(&sender, &(ipc->shared_memory)->sender, sizeof(sender));
+  memcpy(&length, &(ipc->shared_memory)->content_length, sizeof(length)); 
 
-  message_t* msg = (message_t*) malloc(sizeof(message_t) + length);
-  read(ipc->shared_memory, msg->content, length);
+  /* Alloc and read content: */
+  size_t message_size = sizeof(message_t) + length;
+  message_t* msg = (message_t*) malloc(message_size);
+  memcpy(msg->content, (ipc->shared_memory)->content, length);
 
   msg->sender = sender;
   msg->content_length = length;
@@ -140,17 +146,17 @@ static sem_t *sem4;
 void
 init_mutex(void)
 {
-    if ( !(sem1 = sem_open("/sem1", O_RDWR | O_CREAT, 0666, 1)) )
-        fatal("sem_open1 failure");
+  if ( !(sem1 = sem_open("/sem1", O_RDWR | O_CREAT, 0666, 1)) )
+      fatal("sem_open1 failure");
 
-    if ( !(sem2 = sem_open("/sem2", O_RDWR | O_CREAT, 0666, 0)) )
-        fatal("sem_open2 failure");
+  if ( !(sem2 = sem_open("/sem2", O_RDWR | O_CREAT, 0666, 0)) )
+      fatal("sem_open2 failure");
 
-    if ( !(sem3 = sem_open("/sem3", O_RDWR | O_CREAT, 0666, 0)) )
-        fatal("sem_open3 failure");
+  if ( !(sem3 = sem_open("/sem3", O_RDWR | O_CREAT, 0666, 0)) )
+      fatal("sem_open3 failure");
 
-    if ( !(sem4 = sem_open("/sem4", O_RDWR | O_CREAT, 0666, 0)) )
-        fatal("sem_open4 failure");  
+  if ( !(sem4 = sem_open("/sem4", O_RDWR | O_CREAT, 0666, 0)) )
+      fatal("sem_open4 failure");  
 }
 
 int
@@ -201,20 +207,24 @@ inc(int numsem)
 /********************SHARED MEMORY**********************/
 /*******************************************************/
 
-int
+message_t*
 get_memory(char* root, ipc_t *ipc){
-  int fd, ft;
+  int fd, ft, shmsz;
+  message_t *mem;
 
-  if(ipc->id == ipc->server_id)
-    fd = shm_open(root, O_RDWR | O_CREAT, 0666);
-    
-  if(ipc->id != ipc->server_id)
-    fd = shm_open(root, O_RDWR, 0666);
+  shmsz = sizeof(message_t);
 
-  ft = ftruncate(fd,1024);
+  fd = shm_open(root, O_RDWR | O_CREAT, 0666);
+
+  ft = ftruncate(fd, shmsz);
   if( ft == -1) fatal("ftruncate failure");
 
-  return fd;
+  mem = mmap(NULL, shmsz, PROT_READ | PROT_WRITE, MAP_SHARED, fd, 0);
+
+  if(mem == MAP_FAILED) fatal("mmap failure");
+  if(close(fd)) fatal("close failure");
+
+  return mem;
 }
 
 void

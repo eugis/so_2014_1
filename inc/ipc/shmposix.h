@@ -16,7 +16,7 @@ typedef enum { false, true } bool;
 typedef struct {
     uint16_t server_id;
     uint16_t id;
-    int shared_memory;
+    message_t *shared_memory;
     char * addr;
 } ipc_t;
 
@@ -25,7 +25,7 @@ void fatal(char *s);
 void init_mutex(void);
 int close_mutex(void);
 
-int get_memory(char* root, ipc_t *ipc);
+message_t* get_memory(char* root, ipc_t *ipc);
 void free_memory(char *addr);
 void handle_signal(int signal);
 void install_signal_handler();
