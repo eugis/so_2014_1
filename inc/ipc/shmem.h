@@ -1,12 +1,6 @@
 #ifndef __SHMEM_H__
 #define __SHMEM_H__
 
-// #include <stdio.h>
-// #include <stdlib.h>
-// #include <fcntl.h>
-// #include <sys/stat.h>
-// #include <sys/mman.h>
-// #include <semaphore.h>
 #include <stdint.h>
 
 /* Semaphores: */
@@ -16,8 +10,9 @@
 
 #define SHARED_MEMORY_SIZE (1024 * 2)
 
-#define SYSV_KEY_SHM 5
-#define SYSV_KEY_SEM 9
+#define SYSV_KEY_SHM 1
+#define SYSV_KEY_SEM 2
+
 
 typedef struct {
     uint16_t id;
