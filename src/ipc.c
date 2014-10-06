@@ -8,4 +8,7 @@
 
 #elif defined(IPC_SHMEM)
     #include "ipc/shmem.c"
+
+#elif defined(IPC_MQUEUES)
+    #include "ipc/mqueues.c"
 #endif
