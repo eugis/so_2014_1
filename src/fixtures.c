@@ -12,6 +12,9 @@ static movie_t fixtures_read1(char *line) {
     char *m_name = strtok(line, ",");
     char *m_time = strtok(NULL, ",");
 
+    m_time[strlen(m_time)] = 0; /* Swallow newline */
+    decdump(m_time, strlen(m_time) + 1);
+
     movie_init(&movie, m_name, m_time);
 
     return movie;

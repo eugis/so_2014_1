@@ -3,9 +3,9 @@
 #include <libgen.h>
 
 
-void hexdump(void *memory, size_t length) {
+void decdump(void *memory, size_t length) {
     for (size_t i = 0; i < length; i++)
-        printf(" %02x", ((char*) memory)[i]);
+        printf(" %03d", ((char*) memory)[i]);
 
     printf("\n");
     fflush(stdout);

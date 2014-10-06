@@ -6,7 +6,7 @@
 #include <stdio.h>
 #include <fcntl.h>
 
-#define MOVIE_MAX_TICKETS 2
+#define MOVIE_MAX_TICKETS 20
 #define MOVIE_NAME_LENGTH 100
 #define MOVIE_TIME_LENGTH 100
 

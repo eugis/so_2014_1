@@ -78,8 +78,14 @@ void res_movie_list(ipc_t *ipc, database_t *db, uint16_t sender) {
 }
 
 void han_movie_list(res_movie_list_t *res) {
-    for (int i = 0; i < res->count; i++)
-        printf("[%d] %s\n", i + 1, res->movies[i].name);
+    for (int i = 0; i < res->count; i++) {
+        printf(
+            "[%d] %-30s%s\n",
+            i + 1,                  /* Movie index */
+            res->movies[i].name,    /* Movie title */
+            res->movies[i].time     /* Movie time */
+        );
+    }
 }
 
 
