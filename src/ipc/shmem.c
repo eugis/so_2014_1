@@ -1,22 +1,12 @@
 #include "../../inc/ipc/shmem.h"
 #include "../../inc/utils.h"
 
-// #include <stdio.h>
-// #include <stdlib.h>
-// #include <string.h>
-// #include <fcntl.h>
-// #include <sys/stat.h>
-// #include <semaphore.h>
 #include <sys/shm.h>
 #include <sys/ipc.h>
 #include <errno.h>
-// #include <stdlib.h>
-// #include <sys/mman.h>
-// #include <stdint.h>
 #include <sys/types.h>
 #include <sys/sem.h>
 #include <unistd.h>
-// #include <signal.h>
 
 
 static void *shalloc(char *address) {
