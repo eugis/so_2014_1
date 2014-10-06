@@ -15,6 +15,9 @@
 
 #define debug(...) ((void) (printf(__VA_ARGS__), fflush(0)))
 
+
+void hexdump(void *memory, size_t length);
+
 int streq(char *s1, char *s2);
 
 char *filepath(char *path);

@@ -3,6 +3,14 @@
 #include <libgen.h>
 
 
+void hexdump(void *memory, size_t length) {
+    for (size_t i = 0; i < length; i++)
+        printf(" %02x", ((char*) memory)[i]);
+
+    printf("\n");
+    fflush(stdout);
+}
+
 int streq(char *s1, char *s2) {
     return strcmp(s1, s2) == 0;
 }
