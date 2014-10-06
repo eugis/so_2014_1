@@ -84,6 +84,7 @@ typedef struct {
 
 typedef struct {
     uint8_t type;
+    ticket_t ticket;
     movie_t movie;
 } res_get_ticket_t;
 

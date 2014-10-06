@@ -9,10 +9,10 @@ static ipc_t *ipc_open(char *address) {
     ipc_t *ipc = (ipc_t*) malloc(sizeof(ipc_t));
 
     key_t sysv_key = ftok(address, SYSV_KEY_QUEUE);
-    // check ftok() != -1
+    check(sysv_key != -1, "Cannot obtain shared queue\n");
 
     ipc->queue = msgget(sysv_key, 0666 | IPC_CREAT);
-    // check msgget() != -1
+    check(ipc->queue != -1, "Cannot obtain shared queue\n");
 
     return ipc;
 }
@@ -52,8 +52,8 @@ void ipc_send(ipc_t *ipc, uint16_t recipient, void *message, uint16_t length) {
     item->content_length = length;
     memcpy(item->content, message, length);
 
-    msgsnd(ipc->queue, item, sizeof(*item) - sizeof(long) + length, 0);
-    // check(s != -1, "Failed to send message\n");
+    int ret = msgsnd(ipc->queue, item, sizeof(*item) - sizeof(long) + length, 0);
+    check(ret != -1, "Failed to post message\n");
 
     free(item);
 }
@@ -62,7 +62,7 @@ message_t *ipc_recv(ipc_t *ipc) {
     static char buf[MESSAGE_BUFFER_SIZE];
 
     int nbytes = msgrcv(ipc->queue, &buf, MESSAGE_BUFFER_SIZE, ipc->id, 0);
-    // check nbytes != -1
+    check(nbytes != -1, "Failed to recieve message\n");
 
     message_t *msg = malloc(nbytes);
     memcpy(msg, buf + sizeof(long), nbytes);

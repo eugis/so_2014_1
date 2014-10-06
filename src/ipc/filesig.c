@@ -95,8 +95,8 @@ ipc_t *ipc_listen(char *dir) {
 
 
 ipc_t *ipc_connect(char *file) {
-    if (access(file, F_OK | R_OK) != 0)
-        return NULL;
+    int ret = access(file, F_OK | R_OK);
+    check(ret != -1, "Cannot open %s\n", file);
 
     ipc_t *ipc = ipc_create(filepath(file));
 
@@ -122,6 +122,8 @@ void ipc_send(ipc_t* ipc, uint16_t recipient, void *content, uint16_t length) {
     sprintf(path, "%s/%d", ipc->root, recipient);
 
     FILE *inbox = fopen(path, "a");
+    check(inbox != NULL, "Cannot open %s\n", path);
+
     fwlock(inbox);
 
     fwrite(content, length, 1, inbox);
@@ -147,6 +149,8 @@ message_t* ipc_recv(ipc_t* ipc) {
     sprintf(path, "%s/%d", ipc->root, ipc->id);
 
     FILE *inbox = fopen(path, "a+");
+    check(inbox != NULL, "Cannot open %s\n", path);
+
     size_t size;
 
     /* Check if the file has messages, wait if it doesn't: */

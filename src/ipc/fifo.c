@@ -13,8 +13,8 @@
 
 static void touch(char *path) {
     FILE *file = fopen(path, "w");
+    check(file != NULL, "Cannot touch %s\n", path);
     fclose(file);
-    // check fopen() and fclose()
 }
 
 
@@ -24,17 +24,16 @@ static int getlock(char *address) {
     touch(path);
 
     key_t sysv_key = ftok(path, SYSV_KEY_FIFO);
-    // check ftok() >= 0
+    check(sysv_key != -1, "Cannot create lock\n");
 
     int semarray = semget(sysv_key, 1, IPC_CREAT | 0666);
-    // check semget() >= 0
+    check(semarray != -1, "Cannot create lock\n");
 
     return semarray;
 }
 
 static void rmlock(int semarray) {
     semctl(semarray, 0, IPC_RMID);
-    // check semctl() != -1
 }
 
 static void acquire(int semarray) {
@@ -44,8 +43,8 @@ static void acquire(int semarray) {
         .sem_flg = 0
     };
 
-    semop(semarray, &sb, 1);
-    // check semop() != -1
+    int ret = semop(semarray, &sb, 1);
+    check(ret != -1, "Failed to acquire lock\n");
 }
 
 static void release(int semarray) {
@@ -55,13 +54,15 @@ static void release(int semarray) {
         .sem_flg = 0
     };
 
-    semop(semarray, &sb, 1);
-    // check semop() != -1
+    int ret = semop(semarray, &sb, 1);
+    check(ret != -1, "Failed to release lock\n");
 }
 
 
 
 ipc_t *ipc_create(char *root) {
+    int ret;
+
     ipc_t *ipc = (ipc_t*) malloc(sizeof(ipc_t));
 
     ipc->root = strdup(root);
@@ -69,13 +70,14 @@ ipc_t *ipc_create(char *root) {
 
     char path[250];
     sprintf(path, "%s/%d", root, getpid());
-    mkfifo(path, 0666);
-    // check file < 0 => fatal error!
+
+    ret = mkfifo(path, 0666);
+    check(ret != -1, "Cannot create FIFO %s\n", root);
 
     ipc->lock = getlock(path);
 
-    semctl(ipc->lock, 0, SETVAL, 1);
-    // check semctl()
+    ret = semctl(ipc->lock, 0, SETVAL, 1);
+    check(ret != -1, "Failed to access lock\n", root);
 
     return ipc;
 }
@@ -91,8 +93,8 @@ ipc_t *ipc_listen(char *dir) {
 
 
 ipc_t *ipc_connect(char *file) {
-    if (access(file, F_OK | R_OK | W_OK) != 0)
-        return NULL;
+    int ret = access(file, F_OK | R_OK | W_OK);
+    check(ret != -1, "Cannot open %s\n", file);
 
     ipc_t *ipc = ipc_create(filepath(file));
 
@@ -105,10 +107,13 @@ ipc_t *ipc_connect(char *file) {
 
 void ipc_close(ipc_t* ipc) {
     char path[250];
-    sprintf(path, "%s/%d", ipc->root, ipc->id);
 
     rmlock(ipc->lock);
 
+    sprintf(path, "%s/%d", ipc->root, ipc->id);
+    unlink(path);
+
+    sprintf(path, "%s/%d.lock", ipc->root, ipc->id);
     unlink(path);
 
     free(ipc->root);
@@ -124,7 +129,7 @@ void ipc_send(ipc_t* ipc, uint16_t recipient, void *content, uint16_t length) {
     acquire(lock);
 
     int inbox = open(path, O_RDWR);
-    // check inbox < 1 => Error connecting to server
+    check(inbox != -1, "Cannot open %s\n", path);
 
     write(inbox, &(ipc->id), sizeof(ipc->id));
     write(inbox, &length, sizeof(length));
@@ -140,6 +145,7 @@ message_t* ipc_recv(ipc_t* ipc) {
     sprintf(path, "%s/%d", ipc->root, ipc->id);
 
     int inbox = open(path, O_RDWR);
+    check(inbox != -1, "Cannot open %s\n", path);
 
     /* Read header */
     uint16_t sender;

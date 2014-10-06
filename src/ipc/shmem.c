@@ -11,36 +11,34 @@
 
 static void *shalloc(char *address) {
     key_t sysv_key = ftok(address, SYSV_KEY_SHM);
-    // check ftok() >= 0
+    check(sysv_key != -1, "Cannot obtain shared memory\n");
 
     int id = shmget(sysv_key, SHARED_MEMORY_SIZE, 0666 | IPC_CREAT);
-    // check shmget() >= 0
+    check(id != -1, "Cannot obtain shared memory\n");
 
     void *memory = shmat(id, NULL, 0);
-    // check shmat() != (void*) -1
+    check(memory != (void*) -1, "Cannot obtain shared memory\n");
 
     return memory;
 }
 
 static void shfree(void *memory) {
     shmdt(memory);
-    // check shmdt() != -1
 }
 
 
 static int semcreate(char *address) {
     key_t sysv_key = ftok(address, SYSV_KEY_SEM);
-    // check ftok() >= 0
+    check(sysv_key != -1, "Cannot create semaphore\n");
 
     int semarray = semget(sysv_key, 3, IPC_CREAT | 0666);
-    // check semget() >= 0
+    check(semarray != -1, "Cannot create semaphore\n");
 
     return semarray;
 }
 
 static void semdestroy(int semarray) {
     semctl(semarray, 0, IPC_RMID);
-    // check semctl() != -1
 }
 
 static void emit(int semarray, int semindex) {
@@ -50,8 +48,8 @@ static void emit(int semarray, int semindex) {
         .sem_flg = 0
     };
 
-    semop(semarray, &sb, 1);
-    // check semop() != -1
+    int ret = semop(semarray, &sb, 1);
+    check(ret != -1, "Failed to emit() semaphore\n");
 }
 
 static void await(int semarray, int semindex) {
@@ -61,8 +59,8 @@ static void await(int semarray, int semindex) {
         .sem_flg = 0
     };
 
-    semop(semarray, &sb, 1);
-    // check semop() != -1
+    int ret = semop(semarray, &sb, 1);
+    check(ret != -1, "Failed to await() semaphore\n");
 }
 
 

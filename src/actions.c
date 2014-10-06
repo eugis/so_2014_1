@@ -139,8 +139,9 @@ void res_get_ticket(ipc_t *ipc, database_t *db, uint16_t sender, req_get_ticket_
 
     if (movie != NULL) {
         res_get_ticket_t res = {
-            .type  = ACTION_GET_TICKET,
-            .movie = *movie
+            .type   = ACTION_GET_TICKET,
+            .ticket = req->ticket,
+            .movie  = *movie
         };
 
         ipc_send(ipc, sender, &res, sizeof(res));
@@ -150,5 +151,7 @@ void res_get_ticket(ipc_t *ipc, database_t *db, uint16_t sender, req_get_ticket_
 }
 
 void han_get_ticket(res_get_ticket_t *res) {
-    printf("Ticket for: %s\n", res->movie.name);
+    printf("Ticket number %d:\n", res->ticket);
+    printf("  Movie: %s\n", res->movie.name);
+    printf("  Time : %s\n", res->movie.time);
 }
