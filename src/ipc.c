@@ -11,4 +11,7 @@
 
 #elif defined(IPC_MQUEUES)
     #include "ipc/mqueues.c"
+
+#elif defined(IPC_FIFOS)
+    #include "ipc/fifo.c"
 #endif

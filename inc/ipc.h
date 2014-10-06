@@ -26,6 +26,9 @@ typedef struct {
 #elif defined(IPC_MQUEUES)
     #include "ipc/mqueues.h"
 
+#elif defined(IPC_FIFOS)
+    #include "ipc/fifo.h"
+
 #else
     #error No IPC selected (use make IPC=[FILESIG|SOCKETS])
 #endif
