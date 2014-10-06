@@ -4,16 +4,19 @@
 
 #include "../inc/fixtures.h"
 #include "../inc/database.h"
+#include "../inc/utils.h"
 
 
 static movie_t fixtures_read1(char *line) {
     movie_t movie;
 
+    size_t line_len = strlen(line);
+
+    if (line[line_len - 1] == '\n')
+        line[line_len - 1] = 0;
+
     char *m_name = strtok(line, ",");
     char *m_time = strtok(NULL, ",");
-
-    m_time[strlen(m_time)] = 0; /* Swallow newline */
-    decdump(m_time, strlen(m_time) + 1);
 
     movie_init(&movie, m_name, m_time);
 
