@@ -29,22 +29,29 @@ ipc_t *ipc_listen(char *port_str) {
 }
 
 
-ipc_t *ipc_connect(char *port_str) {
-    int port = atoi(port_str);
+ipc_t *ipc_connect(char *address) {
+    int ret;
+
+    char *ip_host_str = strtok(address, ":");
+    char *ip_port_str = strtok(NULL, ":");
+
+    int port = atoi(ip_port_str);
     // check string is numeric
 
     ipc_t *ipc = (ipc_t*) calloc(1, sizeof(ipc_t));
 
-    ipc->id = socket(AF_INET, SOCK_STREAM, 0);
-    // check socket() >= 0
+    ret = socket(AF_INET, SOCK_STREAM, 0);
+    check(ret != -1, "Cannot create socket\n");
+    ipc->id = ret;
 
     ipc->address.sin_family = AF_INET;
     ipc->address.sin_port = htons(port);
-    inet_pton(AF_INET, "127.0.0.1", &(ipc->address.sin_addr));
-    // check inet_pton() > 0
 
-    connect(ipc->id, (struct sockaddr*) &(ipc->address), sizeof(ipc->address));
-    // check connect() >= 0
+    ret = inet_pton(AF_INET, ip_host_str, &(ipc->address.sin_addr));
+    check(ret == 1, "Cannot resolve address\n");
+
+    ret = connect(ipc->id, (struct sockaddr*) &(ipc->address), sizeof(ipc->address));
+    check(ret != -1, "Connection failed\n");
 
     ipc->server_id = ipc->id;
 

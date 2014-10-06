@@ -1,6 +1,7 @@
 #include "../inc/utils.h"
 
 #include <libgen.h>
+#include <stdarg.h>
 
 
 void decdump(void *memory, size_t length) {
@@ -11,8 +12,25 @@ void decdump(void *memory, size_t length) {
     fflush(stdout);
 }
 
+
 int streq(char *s1, char *s2) {
     return strcmp(s1, s2) == 0;
+}
+
+
+void check(int condition, char *fmt, ...) {
+    if (condition) return;
+
+    int err = errno;
+
+    va_list args;
+    va_start(args, fmt);
+
+    vprintf(fmt, args);
+    if (err) printf(" errno %d\n", err);
+
+    va_end(args);
+    exit(1);
 }
 
 

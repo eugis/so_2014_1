@@ -20,8 +20,6 @@ int main(int argc, char** argv) {
     /* Valid arguments, valid command. Let's connect */
 
     ipc_t *ipc = ipc_connect(server);
-    check(ipc != NULL, "Failed to connect to %s\n", server);
-
 
     switch (action_code) {
         case ACTION_MOVIE_LIST:

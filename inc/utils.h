@@ -4,6 +4,7 @@
 #include <string.h>
 #include <stdlib.h>
 #include <stdio.h>
+#include <errno.h>
 
 #define CONCAT1(x) x ## 1
 #define CONCAT2(x) CONCAT1(x)
@@ -11,10 +12,10 @@
 
 
 #define abort(...) ( (printf(__VA_ARGS__), exit(1), 1 ) )
-#define check(expr, ...)  ((void) ((expr) || abort(__VA_ARGS__)) )
 
 #define debug(...) ((void) (printf(__VA_ARGS__), fflush(0)))
 
+void check(int condition, char *fmt, ...);
 
 void decdump(void *memory, size_t length);
 
