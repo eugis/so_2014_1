@@ -27,7 +27,7 @@ void check(int condition, char *fmt, ...) {
     va_start(args, fmt);
 
     vprintf(fmt, args);
-    if (err) printf(" errno %d\n", err);
+    if (err) printf(" errno %d (%s)\n", err, strerror(err));
 
     va_end(args);
     exit(1);

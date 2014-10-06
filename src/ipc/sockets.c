@@ -4,23 +4,25 @@
 #include <arpa/inet.h>
 
 ipc_t *ipc_listen(char *port_str) {
+    int ret;
     int port = atoi(port_str);
-    // check string is numeric
 
     ipc_t *ipc = (ipc_t*) calloc(1, sizeof(ipc_t));
 
-    ipc->id = socket(AF_INET, SOCK_STREAM, 0);
-    // check socket() >= 0
+    ret = socket(AF_INET, SOCK_STREAM, 0);
+    check(ret >= 0, "Cannot create socket\n");
+    ipc->id = ret;
+
 
     ipc->address.sin_family = AF_INET;
     ipc->address.sin_addr.s_addr = INADDR_ANY;
     ipc->address.sin_port = htons(port);
 
-    bind(ipc->id, (struct sockaddr*) &(ipc->address), sizeof(ipc->address));
-    // check bind() >= 0
+    ret = bind(ipc->id, (struct sockaddr*) &(ipc->address), sizeof(ipc->address));
+    check(ret != -1, "Cannot bind port %d\n", port);
 
-    listen(ipc->id, 5);
-    // check listen() >= 0
+    ret = listen(ipc->id, 5);
+    check(ret != -1, "Cannot listen on port %d\n", port);
 
     ipc->server_id = ipc->id;
     ipc->is_server = 1;
@@ -36,7 +38,6 @@ ipc_t *ipc_connect(char *address) {
     char *ip_port_str = strtok(NULL, ":");
 
     int port = atoi(ip_port_str);
-    // check string is numeric
 
     ipc_t *ipc = (ipc_t*) calloc(1, sizeof(ipc_t));
 
@@ -48,7 +49,7 @@ ipc_t *ipc_connect(char *address) {
     ipc->address.sin_port = htons(port);
 
     ret = inet_pton(AF_INET, ip_host_str, &(ipc->address.sin_addr));
-    check(ret == 1, "Cannot resolve address\n");
+    check(ret == 1, "Cannot resolve address %s\n", address);
 
     ret = connect(ipc->id, (struct sockaddr*) &(ipc->address), sizeof(ipc->address));
     check(ret != -1, "Connection failed\n");
